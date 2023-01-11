@@ -60,7 +60,7 @@ const syncHandler: WebsocketRequestHandler = (ws, req) => {
     masterDocs[noteId] = doc;
     const sharedType = doc.get("content", Y.XmlText) as Y.XmlText;
 
-    // Convert note contents to yjs datatype and store it in ydoc.
+    // Convert note contents from slate to yjs datatype and store it in ydoc.
     sharedType.applyDelta(slateNodesToInsertDelta(note.content));
 
     // send the encoded ydoc to client
@@ -71,7 +71,7 @@ const syncHandler: WebsocketRequestHandler = (ws, req) => {
   ws.on("message", (data) => {
     // console.log("Data received");
 
-    // Merge data using yjs and broadcast to all clients.
+    // Merge data using yjs and broadcast to all clients connected to note.
     const doc = masterDocs[noteId];
     Y.applyUpdate(doc, new Uint8Array(data as ArrayBufferLike));
 
@@ -89,7 +89,7 @@ const syncHandler: WebsocketRequestHandler = (ws, req) => {
   ws.on("close", function () {
     console.log("Client disconnected");
 
-    //get all connected clients to a note
+    //filter out diconnected client
     clients[noteId] = clients[noteId].filter((client) => client !== ws);
 
     //delete endoced Ydoc from memory if all clinets are disconnected

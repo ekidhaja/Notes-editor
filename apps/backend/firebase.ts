@@ -5,7 +5,7 @@ import serviceAccount from "./serviceAccountKey.json";
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://databaseName.firebaseio.com",
+  databaseURL: "https://editor-project99261.firebaseio.com",
 });
 
 export default admin.firestore();
