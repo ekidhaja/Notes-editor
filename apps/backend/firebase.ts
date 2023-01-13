@@ -4,7 +4,7 @@ import admin from "firebase-admin";
 import serviceAccount from "./serviceAccountKey.json";
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert("./serviceAccountKey.json"),
   databaseURL: "https://editor-project99261.firebaseio.com",
 });
 

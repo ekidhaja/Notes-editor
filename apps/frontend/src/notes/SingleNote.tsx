@@ -11,6 +11,7 @@ interface SingleNoteProps {
 
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
   const { note, readyState } = useNote(id);
+  console.log("note is: ", note)
 
   const connectionStatusColor = {
     [ReadyState.CONNECTING]: "info",

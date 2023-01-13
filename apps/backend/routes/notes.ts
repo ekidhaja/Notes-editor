@@ -1,6 +1,8 @@
 import express, { RequestHandler, Response } from 'express';
 import { WebsocketRequestHandler } from 'express-ws';
-import { Descendant } from 'slate';
+import * as WebSocketType from 'ws';
+import { NotesResponse, NoteResponse } from '../types';
+import { getNotes, getNote } from '../utils';
 
 import { NOTE_1, NOTE_2 } from '../fixtures/notes';
 
@@ -12,48 +14,42 @@ patch.default(express.Router);
 
 const router = express.Router();
 
-export interface NotesResponse {
-  notes: Array<{
-    id: string;
-    title: string;
-  }>;
-}
+let clients: WebSocketType[] = [];
 
-export interface NoteResponse {
-  id: string;
-  title: string;
-  content: Array<Descendant>;
-}
+const notesHandler: RequestHandler = async (_req, res: Response<NotesResponse>) => {
+  const notes = await getNotes();
 
-const notesHandler: RequestHandler = (_req, res: Response<NotesResponse>) => {
-  res.json({
-    notes: [
-      {
-        id: NOTE_1.id,
-        title: NOTE_1.title,
-      },
-      {
-        id: NOTE_2.id,
-        title: NOTE_2.title,
-      },
-    ],
+  res.json({ notes });
+};
+
+const notesHandlerWS: WebsocketRequestHandler = async (ws, req) => {
+  console.log("client connected for all notes");
+
+  const notes = await getNotes();
+  console.log("notes are: ", notes)
+
+  ws.send(JSON.stringify(notes));
+
+  clients.push(ws);
+
+  ws.on("close", function () {
+    console.log("Client disconnected");
+  
+    //filter out diconnected client
+    clients = clients.filter((client) => client !== ws);
   });
 };
 
-const noteHandler: WebsocketRequestHandler = (ws, req) => {
-  ws.on("message", () => {
-    switch (req.params.id) {
-      case NOTE_1.id: {
-        return ws.send(JSON.stringify(NOTE_1));
-      }
-      case NOTE_2.id: {
-        return ws.send(JSON.stringify(NOTE_2));
-      }
-    }
+const noteHandler: WebsocketRequestHandler = async (ws, req) => {
+  ws.on("message", async () => {
+    const note = await getNote(req.params.id);
+    console.log("note is: ", note)
+    return ws.send(JSON.stringify(NOTE_1));
   });
 };
 
 router.get("/", notesHandler);
 router.ws("/:id", noteHandler);
+router.ws("/", notesHandlerWS);
 
 export default router;
