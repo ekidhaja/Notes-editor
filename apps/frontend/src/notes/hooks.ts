@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { NotesResponse, NoteResponse } from "../../../backend/types";
 import useWebSocket, { ReadyState } from "react-use-websocket";

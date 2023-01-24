@@ -4,10 +4,8 @@ import { WebsocketRequestHandler } from 'express-ws';
 import * as WebSocketType from 'ws';
 import * as Y from 'yjs';
 
-import * as Notes from '../fixtures/notes';
-
-//temp datastore of all notes. This will be replaced with actual notes stored in the database
-const notes: { [k: string]: Notes.Note } = { ...Notes };
+import { getNote } from '../utils';
+import { addToCache, getFromCache } from '../cache';
 
 // Patch `express.Router` to support `.ws()` without needing to pass around a `ws`-ified app.
 // https://github.com/HenningM/express-ws/issues/86
@@ -22,15 +20,7 @@ const router = express.Router();
 */
 const clients: { [k: string]: WebSocketType[] } = {};
 
-/**
- * An in-memory storage of Y.Docs. One Y.Doc per note.
- * This stores notes currently being edited in memory
- * It is retrieved from db when someone connects to a note for the first time
- * When all websocket clients are disconnected, the corresponding item is deleted from the in-memory storage.
-*/
-const masterDocs: { [k: string]: Y.Doc } = {};
-
-const syncHandler: WebsocketRequestHandler = (ws, req) => {
+const syncHandler: WebsocketRequestHandler = async (ws, req) => {
   const noteId = req.params.id;
   console.log("Client connected");
 
@@ -40,27 +30,21 @@ const syncHandler: WebsocketRequestHandler = (ws, req) => {
   /* Check if encoded Ydoc is in memory and send to client
   * Else retrieve note from db, encode to Ydoc and send to client
   */
-  if(masterDocs[noteId]) {
-    const doc = masterDocs[noteId];
+  if(getFromCache(noteId)) {
+    const doc = getFromCache(noteId);
     ws.send(Y.encodeStateAsUpdate(doc));
   } 
   else {
-    // Find the correct note. Replace this with db query.
-    let note = null;
-    for (const i in notes) {
-      if (notes[i].id === noteId) {
-        note = notes[i];
-        break;
-      }
-    }
-    if (!note) return;
+    // Get note from db
+    const note = await getNote(noteId);
+    if (!note) return; 
 
     // Create a new YDoc instance
-    const doc = new Y.Doc();
-    masterDocs[noteId] = doc;
-    const sharedType = doc.get("content", Y.XmlText) as Y.XmlText;
+    const doc = new Y.Doc(); 
+    addToCache(noteId, doc);
 
-    // Convert note contents from slate to yjs datatype and store it in ydoc.
+    // Declare a shared type and convert note contents from slate to yjs datatype and store it in ydoc.
+    const sharedType = doc.get("content", Y.XmlText) as Y.XmlText;
     sharedType.applyDelta(slateNodesToInsertDelta(note.content));
 
     // send the encoded ydoc to client
@@ -69,11 +53,13 @@ const syncHandler: WebsocketRequestHandler = (ws, req) => {
 
   // Receive note edits from clients
   ws.on("message", (data) => {
-    // console.log("Data received");
+    //get ydoc from in-memory storage
+    const doc = getFromCache(noteId);
 
-    // Merge data using yjs and broadcast to all clients connected to note.
-    const doc = masterDocs[noteId];
+    // Merge data using yjs.
     Y.applyUpdate(doc, new Uint8Array(data as ArrayBufferLike));
+
+    //masterDocs[noteId] = doc;
 
     // Send update to all clients with the new doc
     clients[noteId].forEach((client) => {
@@ -82,21 +68,18 @@ const syncHandler: WebsocketRequestHandler = (ws, req) => {
 
   });
 
-  ws.on("open", function () {
-    console.log("websocket connection open");
-  });
-
+  //clean up on client disconnection
   ws.on("close", function () {
     console.log("Client disconnected");
 
     //filter out diconnected client
     clients[noteId] = clients[noteId].filter((client) => client !== ws);
 
-    //delete endoced Ydoc from memory if all clinets are disconnected
-    if (!clients[noteId].length) {
-      console.log("All clients disconnected. Deleting masterDoc");
-      delete masterDocs[noteId];
-    }
+    // //delete endoced Ydoc from memory if all clinets are disconnected
+    // if (!clients[noteId].length) {
+    //   console.log("All clients disconnected. Deleting note from in-memory store"); 
+    //   delete masterDocs[noteId];
+    // }
   });
 
 };

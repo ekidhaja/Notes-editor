@@ -1,6 +1,8 @@
 import Head from "next/head";
 import type { AppProps } from "next/app";
 import CssBaseline from "@mui/material/CssBaseline";
+import React from "react";
+import NoteContextProvider from "../src/contexts/NoteContext";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -17,7 +19,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
       </Head>
       <CssBaseline />
-      <Component {...pageProps} />
+      <NoteContextProvider>
+        <Component {...pageProps} />
+      </NoteContextProvider>
     </>
   );
 }

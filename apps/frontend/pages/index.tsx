@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { Interface } from "../src/layout";
 import { SingleNote } from "../src/notes";
+import React from "react";
 
 const Home: NextPage = () => {
   return (

@@ -1,6 +1,7 @@
 import { Badge, BadgeTypeMap, Paper, TextField } from '@mui/material';
-import React from 'react';
-import { ReadyState } from 'react-use-websocket';
+import React, { useEffect, useContext } from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { NoteContext } from '../contexts/NoteContext';
 
 import { Editor } from '../editor';
 import { useNote } from './hooks';
@@ -11,7 +12,7 @@ interface SingleNoteProps {
 
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
   const { note, readyState } = useNote(id);
-  console.log("note is: ", note)
+  const { activeNote, dispatch } = useContext(NoteContext);
 
   const connectionStatusColor = {
     [ReadyState.CONNECTING]: "info",
@@ -21,11 +22,18 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
     [ReadyState.UNINSTANTIATED]: "error",
   }[readyState] as BadgeTypeMap["props"]["color"];
 
+  //set activeNote when note changes
+  useEffect(() => {
+    if(note && note?.id !== activeNote.id) {
+      dispatch({ type: "SET", note: { id: note.id, title: note.title }});
+    }
+  }, [note]);
+
   return note ? (
     <>
       <Badge color={connectionStatusColor} variant="dot" sx={{ width: "100%" }}>
         <TextField
-          value={note.title}
+          value={activeNote.title}
           variant="standard"
           fullWidth={true}
           inputProps={{ style: { fontSize: 32, color: "#666" } }}

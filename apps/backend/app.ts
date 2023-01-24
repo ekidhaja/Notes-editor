@@ -3,6 +3,7 @@ import cors from "cors";
 import expressWs from "express-ws";
 
 import apiRoutes from "./routes";
+import { dbWorker } from "./workers";
 
 const app = express();
 const PORT = 3001;
@@ -13,6 +14,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 app.use("/api", apiRoutes);
+
+dbWorker();
 
 app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);

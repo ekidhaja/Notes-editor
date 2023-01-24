@@ -8,6 +8,7 @@ import {
   Container,
 } from "@mui/material";
 import { NotesList } from "../notes";
+import AddButton from '../components/AddButton';
 
 const drawerWidth = 240;
 
@@ -39,6 +40,7 @@ const Interface: React.FC<InterfaceProps> = ({ activeNoteId, children }) => {
           >
             Notes
           </Typography>
+          <AddButton  />
         </Toolbar>
         <Divider />
         <NotesList activeNoteId={activeNoteId} />
