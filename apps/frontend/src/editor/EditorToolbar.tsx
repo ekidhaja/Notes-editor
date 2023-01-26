@@ -5,9 +5,27 @@ import {
   toggleMark,
   isBlockActive,
   isMarkActive,
+  isLinkActive, 
+  insertLink, 
+  unwrapLink
 } from "./helpers";
 import { CustomElementType } from "./CustomElement";
 import { CustomText } from "./CustomLeaf";
+import { 
+  FormatBold, 
+  FormatItalic, 
+  FormatUnderlined, 
+  Code, 
+  LooksOne, 
+  LooksTwo, 
+  FormatListBulleted,
+  FormatListNumbered,
+  FormatQuote,
+  Link,
+  LinkOff
+} from "@mui/icons-material"
+import { OverridableComponent } from '@mui/material/OverridableComponent';
+import { SvgIconTypeMap } from '@mui/material';
 
 interface ButtonProps {
   active: boolean;
@@ -27,14 +45,12 @@ const Button: React.FC<ButtonProps> = ({ active, children, onMouseDown }) => (
   </button>
 );
 
-const Icon: React.FC = ({ children }) => <span>{children}</span>;
-
 interface BlockButtonProps {
   format: CustomElementType;
-  icon: string;
+  Icon: OverridableComponent<SvgIconTypeMap<unknown, "svg">>
 }
 
-const BlockButton: React.FC<BlockButtonProps> = ({ format, icon }) => {
+const BlockButton: React.FC<BlockButtonProps> = ({ format, Icon }) => {
   const editor = useSlate();
   return (
     <Button
@@ -44,17 +60,17 @@ const BlockButton: React.FC<BlockButtonProps> = ({ format, icon }) => {
         toggleBlock(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon sx={{ fontSize: 24 }} />
     </Button>
   );
 };
 
 interface MarkButtonProps {
   format: keyof CustomText;
-  icon: string;
+  Icon: OverridableComponent<SvgIconTypeMap<unknown, "svg">>
 }
 
-const MarkButton: React.FC<MarkButtonProps> = ({ format, icon }) => {
+const MarkButton: React.FC<MarkButtonProps> = ({ format, Icon }) => {
   const editor = useSlate();
   return (
     <Button
@@ -64,29 +80,60 @@ const MarkButton: React.FC<MarkButtonProps> = ({ format, icon }) => {
         toggleMark(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon sx={{ fontSize: 24 }} />
     </Button>
   );
 };
 
+const LinkButton: React.FC = () => {
+  const editor = useSlate()
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={event => {
+        event.preventDefault()
+        const url = window.prompt('Enter the URL of the link:')
+        if (!url) return
+        insertLink(editor, url)
+      }}
+    >
+      <Link sx={{ fontSize: 24 }} />
+    </Button>
+  )
+}
+
+const RemoveLinkButton: React.FC = () => {
+  const editor = useSlate()
+
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={event => {
+        event.preventDefault()
+        if(isLinkActive(editor)) {
+          unwrapLink(editor)
+        }
+      }}
+    >
+      <LinkOff sx={{ fontSize: 24 }} />
+    </Button>
+  )
+}
+
 export const EditorToolbar: React.FC = () => {
   return (
-    <div>
-      <MarkButton format="bold" icon="bold" />
-      <MarkButton format="italic" icon="italic" />
-      <MarkButton format="underline" icon="underlined" />
-      <MarkButton format="code" icon="code" />
-      <BlockButton format={CustomElementType.headingOne} icon="h1" />
-      <BlockButton format={CustomElementType.headingTwo} icon="h2" />
-      <BlockButton format={CustomElementType.blockQuote} icon="quote" />
-      <BlockButton
-        format={CustomElementType.numberedList}
-        icon="list_numbered"
-      />
-      <BlockButton
-        format={CustomElementType.bulletedList}
-        icon="list_bulleted"
-      />
+    <div className="editor-toolbar">
+      <MarkButton format="bold" Icon={FormatBold} />
+      <MarkButton format="italic" Icon={FormatItalic} />   
+      <MarkButton format="underline" Icon={FormatUnderlined} />
+      <MarkButton format="code" Icon={Code} />
+      <BlockButton format={CustomElementType.headingOne} Icon={LooksOne} />
+      <BlockButton format={CustomElementType.headingTwo} Icon={LooksTwo} />
+      <BlockButton format={CustomElementType.blockQuote} Icon={FormatQuote} />
+      <BlockButton format={CustomElementType.numberedList} Icon={FormatListNumbered} />
+      <BlockButton format={CustomElementType.bulletedList} Icon={FormatListBulleted} />
+      <LinkButton />
+      <RemoveLinkButton /> 
     </div>
   );
 };

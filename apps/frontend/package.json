@@ -24,7 +24,8 @@
     "slate": "^0.82.1",
     "slate-history": "^0.66.0",
     "slate-react": "^0.82.1",
-    "swr": "^1.0.1"
+    "swr": "^1.0.1",
+    "slate-hyperscript": "^0.77.0"
   },
   "devDependencies": {
     "@types/react": "17.0.27",
@@ -32,5 +33,10 @@
     "eslint-config-next": "11.1.2",
     "http-proxy-middleware": "^2.0.1",
     "typescript": "4.4.3"
+  },
+  "eslintConfig": {
+    "rules": {
+      "@typescript-eslint/ban-ts-comment": "off"
+    }
   }
 }

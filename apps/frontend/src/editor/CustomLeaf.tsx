@@ -17,9 +17,9 @@ export const CustomLeaf: React.FC<RenderLeafProps> = ({
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
-
+ 
   if (leaf.code) {
-    children = <code>{children}</code>;
+    children = <code style={{ backgroundColor: "#eee", fontWeight: 500, padding: "0px 5px", display: "inline-block" }}>{children}</code>;
   }
 
   if (leaf.italic) {

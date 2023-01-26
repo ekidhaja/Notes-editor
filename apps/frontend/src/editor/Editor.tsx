@@ -3,14 +3,14 @@ import { withYHistory, withYjs, YjsEditor } from '@slate-yjs/core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { BaseEditor, createEditor, Descendant } from 'slate';
-import { HistoryEditor } from 'slate-history';
+import { HistoryEditor, withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import * as Y from 'yjs';
 
 import { CustomElement } from './CustomElement';
 import { CustomLeaf, CustomText } from './CustomLeaf';
 import { EditorToolbar } from './EditorToolbar';
-import { handleHotkeys } from './helpers';
+import { handleHotkeys, withLinks, withHtml } from './helpers';
 
 // Slate suggests overwriting the module to include the ReactEditor, Custom Elements & Text
 // https://docs.slatejs.org/concepts/12-typescript
@@ -63,7 +63,8 @@ export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, 
     })();
   }, [ws.lastMessage]);
 
-  const editor = useMemo(() => withYHistory(withYjs(withReact(createEditor()), sharedType)), []);
+  //const editor = useMemo(() => withYHistory(withYjs(withReact(createEditor()), sharedType)), []);
+  const editor = useMemo(() => withYHistory(withYjs(withHtml(withLinks(withHistory(withReact(createEditor())))), sharedType)), []);
 
   // Connect editor in useEffect to comply with concurrent mode requirements.
   useEffect(() => {
