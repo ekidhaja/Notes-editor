@@ -15,6 +15,11 @@ app.use(cors());
 
 app.use("/api", apiRoutes);
 
+//health check
+app.get("/api/ping", (_req, res) => {
+  res.status(200).json({ message: "pong" });
+});
+
 dbWorker();
 
 app.listen(PORT, () => {

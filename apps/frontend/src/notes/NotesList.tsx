@@ -26,7 +26,7 @@ const NotesList: React.FC<NotesListProps> = ({ activeNoteId }) => {
   const { notesList } = useNotesList();
   const [notes, setNotes] = useState<Note[] | undefined>(notesList);
   const { activeNote, dispatch } = useContext(NoteContext);
-  const ws = useWebSocket(`ws://localhost:3001/api/notes`);
+  const ws = useWebSocket(`${process.env.NEXT_PUBLIC_WS_URL}/api/notes`);
 
   useEffect(() => {
     setNotes(notesList);

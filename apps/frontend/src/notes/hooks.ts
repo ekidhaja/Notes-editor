@@ -13,7 +13,7 @@ const fetcher = async (input: RequestInfo, init: RequestInit) => {
 
 export const useNotesList = () => {
   const { data, error } = useSWR<NotesResponse>(
-    "http://localhost:3001/api/notes",
+    `${process.env.NEXT_PUBLIC_HTTP_URL}/api/notes`,
     fetcher
   );
 
@@ -26,7 +26,7 @@ export const useNotesList = () => {
 
 export const useNote = (id: string) => {
   const { readyState, lastMessage, sendMessage } = useWebSocket(
-    `ws://localhost:3001/api/notes/${id}`
+    `${process.env.NEXT_PUBLIC_WS_URL}/api/notes/${id}`
   );
 
   // Send a message when ready on first load

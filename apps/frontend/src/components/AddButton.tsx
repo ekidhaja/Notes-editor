@@ -9,7 +9,7 @@ const AddButton: React.FC = () => {
     async function addNewNote(title: string) {
         try {
             //make post request to add new note
-            const res = await fetch('http://localhost:3001/api/notes/', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_HTTP_URL}/api/notes/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

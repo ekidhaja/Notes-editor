@@ -33,7 +33,7 @@ export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, 
   const [yDoc, setYDoc] = useState<Y.Doc>();
   const renderElement = useCallback((props) => <CustomElement {...props} />, []);
   const renderLeaf = useCallback((props) => <CustomLeaf {...props} />, []);
-  const ws = useWebSocket(`ws://localhost:3001/api/sync/${noteId}`);
+  const ws = useWebSocket(`${process.env.NEXT_PUBLIC_WS_URL}/api/sync/${noteId}`);
 
   // Create a yjs document and get the shared type
   const sharedType = useMemo(() => {
