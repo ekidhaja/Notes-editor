@@ -14,11 +14,7 @@
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add build"
   },
-  "pre-commit": [
-    "ts.check",
-    "build",
-    "add-build"
-  ],
+  "pre-commit": "ts.check, build, add-build",
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
