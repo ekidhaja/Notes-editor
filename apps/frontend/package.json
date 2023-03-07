@@ -25,7 +25,9 @@
     "slate-history": "^0.66.0",
     "slate-react": "^0.82.1",
     "swr": "^1.0.1",
-    "slate-hyperscript": "^0.77.0"
+    "slate-hyperscript": "^0.77.0",
+    "@slate-yjs/core": "^0.3.0",
+    "yjs": "^13.5.41"
   },
   "devDependencies": {
     "@types/react": "17.0.27",
