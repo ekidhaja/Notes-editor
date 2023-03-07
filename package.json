@@ -10,9 +10,6 @@
     "backend:build": "npm run backend-precommit -w backend",
     "dev": "run-p frontend:dev backend:dev"
   },
-  "pre-commit": [
-    "backend:build"
-  ],
   "resolutions": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
