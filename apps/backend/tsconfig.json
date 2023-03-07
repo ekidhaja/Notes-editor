@@ -1,8 +1,10 @@
 {
-  "extends": "../../tsconfig",
+  
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "./build",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
   },
   "include": [
     "**/*.ts",

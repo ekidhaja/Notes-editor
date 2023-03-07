@@ -10,12 +10,10 @@
     "typecheck": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "rimraf build && tsc",
+    "build": "rm -rf build/ && npx tsc",
     "ts.check": "tsc --project tsconfig.json",
-    "add-build": "git add build"
-  },
-  "pre-commit": {
-    "run": "ts.check, build, add-build"
+    "add-build": "git add build",
+    "backend-precommit": "npm run ts.check && npm run build && npm run add-build"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
